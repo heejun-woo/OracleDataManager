@@ -381,7 +381,7 @@ namespace OracleDataManager
             f.ShowDialog(this);
         }
 
-        private string BuildSqlPreviewText(int maxRowsPerType = 50, int clobPreviewChars = 200)
+        private string BuildSqlPreviewText(int maxRowsPerType = 200, int clobPreviewChars = 200)
         {
             var insRows = _table.Rows.Cast<DataRow>().Where(r => r.RowState == DataRowState.Added).Take(maxRowsPerType).ToList();
             var updRows = _table.Rows.Cast<DataRow>().Where(r => r.RowState == DataRowState.Modified).Take(maxRowsPerType).ToList();
@@ -613,8 +613,9 @@ namespace OracleDataManager
                     }
 
                     // 길이
-                    if (meta.CharLength.HasValue && text.Length > meta.CharLength.Value)
-                        throw new InvalidOperationException($"길이 초과: {meta.Name} (최대 {meta.CharLength.Value})");
+                    if (meta?.CharLength.Value > 0)     
+                        if (meta.CharLength.HasValue && text.Length > meta.CharLength.Value)
+                            throw new InvalidOperationException($"길이 초과: {meta.Name} (최대 {meta.CharLength.Value})");
 
                     // 숫자
                     if (meta.IsNumber && !string.IsNullOrEmpty(text) && !decimal.TryParse(text, out _))
@@ -900,7 +901,7 @@ namespace OracleDataManager
                 ConfigStore.Save(cfg);
             }
 
-            _connStr = ConfigStore.BuildConnStr(cfg); // _connStr을 readonly가 아니라 필드로
+            _connStr = ConfigStore.BuildConnStr(cfg); 
             LoadTableList();
         }
     }
