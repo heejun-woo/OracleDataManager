@@ -16,8 +16,7 @@ namespace OracleDataManager
     public static class ConfigStore
     {
         private static string PathConfig =>
-            System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "OraTableEditor", "connections.json");
+            System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "OracleDataManager", "connections.json");
 
         public static DbConnectionStore LoadStore()
         {

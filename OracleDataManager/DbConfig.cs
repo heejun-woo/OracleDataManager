@@ -6,12 +6,6 @@ using System.Threading.Tasks;
 
 namespace OracleDataManager
 {
-    public sealed class DbConfig
-    {
-        public string UserId { get; set; } = "";
-        public string PasswordEnc { get; set; } = ""; 
-        public string DataSource { get; set; } = "";  
-    }
     public sealed class DbConnectionProfile
     {
         public string Name { get; set; } = "";        // 표시명 (DEV/QA/운영)
