@@ -15,7 +15,7 @@ namespace OracleDataManager
 
         //private readonly string _connStr = "User Id=C##HASED;Password=1234;Data Source = (DESCRIPTION =  (ADDRESS = (PROTOCOL = TCP)(HOST = localhost)(PORT = 1521))  (CONNECT_DATA =    (SID =XE)    (SERVER = DEDICATED)  ));        Pooling=false;";
 
-        string _connStr = string.Empty;
+        private readonly string _connStr;
 
         private string _tableName = "";
         private DataTable _table;
@@ -31,9 +31,10 @@ namespace OracleDataManager
                 // ["EMP"] = new(StringComparer.OrdinalIgnoreCase) { ["EMP_ID"] = "SEQ_EMP_ID" },
             };
 
-        public OracleCrudGridForm()
+        public OracleCrudGridForm(string connStr)
         {
             InitializeComponent();
+            _connStr = connStr;
 
             grid.AutoGenerateColumns = true;
             grid.AllowUserToAddRows = true;
@@ -613,7 +614,7 @@ namespace OracleDataManager
                     }
 
                     // 길이
-                    if (meta?.CharLength.Value > 0)     
+                    if (meta.CharLength.Value > 0)     
                         if (meta.CharLength.HasValue && text.Length > meta.CharLength.Value)
                             throw new InvalidOperationException($"길이 초과: {meta.Name} (최대 {meta.CharLength.Value})");
 
@@ -888,21 +889,14 @@ namespace OracleDataManager
 
         private void OracleCrudGridForm_Load(object sender, EventArgs e)
         {
-            var cfg = ConfigStore.Load();
-            if (cfg == null)
+            try
             {
-                using var f = new ConnectionForm();
-                if (f.ShowDialog(this) != DialogResult.OK)
-                {
-                    Close(); // 사용자가 취소하면 종료
-                    return;
-                }
-                cfg = f.ResultConfig;
-                ConfigStore.Save(cfg);
+                LoadTableList();
             }
-
-            _connStr = ConfigStore.BuildConnStr(cfg); 
-            LoadTableList();
+            catch (Exception ex)
+            {
+                MessageBox.Show("테이블 목록 로드 실패: " + ex.Message);
+            }
         }
     }
 
